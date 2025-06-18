@@ -27,6 +27,7 @@ bool SingleCapturer::configureHook()
         return false;
     
     capturer = new VlcCapture(_uri.value());
+    capturer->callbacks.push_back(this);
     capturer->start();
 
     return true;
