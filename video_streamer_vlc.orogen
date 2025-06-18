@@ -50,3 +50,13 @@ task_context 'Capturer' do
     port_driven
 
 end
+
+task_context 'SingleCapturer' do
+    needs_configuration
+
+    property 'uri', "/std/string"
+
+    output_port('frame', ro_ptr('base::samples::frame::Frame'))
+
+    port_driven # triggered internally when a new image is complete
+end
