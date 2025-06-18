@@ -42,8 +42,12 @@ void SingleCapturer::updateHook()
 {
     SingleCapturerBase::updateHook();
     cv::Mat image;
-    while(capturer->read(image)) {
-        frame_helper::FrameHelper::copyMatToFrame(image,frame);
+    if(capturer->read(image)) {
+
+        cv::Mat newmat;
+        cv::cvtColor(image, newmat, cv::COLOR_BGRA2BGR);
+
+        frame_helper::FrameHelper::copyMatToFrame(newmat,frame);
         frame.time = base::Time::now();
         output.reset(&frame);
         _frame.write(output);
