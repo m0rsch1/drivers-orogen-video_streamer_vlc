@@ -5,6 +5,7 @@
 
 #include "video_streamer_vlc/SingleCapturerBase.hpp"
 #include <video_capture_vlc/VlcCapture.h>
+#include <memory>
 
 namespace video_streamer_vlc{
 
@@ -27,7 +28,7 @@ namespace video_streamer_vlc{
 	friend class SingleCapturerBase;
     protected:
 
-        VlcCapture *capturer;
+        std::shared_ptr<VlcCapture> capturer;
         base::samples::frame::Frame frame;
         RTT::extras::ReadOnlyPointer<base::samples::frame::Frame> output; 
 

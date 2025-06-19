@@ -26,9 +26,12 @@ bool SingleCapturer::configureHook()
     if (! SingleCapturerBase::configureHook())
         return false;
     
-    capturer = new VlcCapture(_uri.value());
+    if (_input_buffer_ms.value() >=0 ) {
+        capturer = std::make_shared<VlcCapture>(_uri.value(), _input_buffer_ms.value());
+    } else {
+        capturer = std::make_shared<VlcCapture>(_uri.value());
+    }
     capturer->callbacks.push_back(this);
-    capturer->start();
 
     return true;
 }
@@ -36,21 +39,24 @@ bool SingleCapturer::startHook()
 {
     if (! SingleCapturerBase::startHook())
         return false;
+    capturer->start();
     return true;
 }
 void SingleCapturer::updateHook()
 {
     SingleCapturerBase::updateHook();
-    cv::Mat image;
-    if(capturer->read(image)) {
 
-        cv::Mat newmat;
-        cv::cvtColor(image, newmat, cv::COLOR_BGRA2BGR);
+    cv::Mat image;
+    if (capturer->read(image)) {
+
+        cv::Mat newmat(image.size(), CV_8UC3);
+        cv::cvtColor(image, newmat, cv::COLOR_RGBA2BGR);
 
         frame_helper::FrameHelper::copyMatToFrame(newmat,frame);
         frame.time = base::Time::now();
+
         output.reset(&frame);
-        _frame.write(output);
+        _frame.write(output);        
     }
 }
 void SingleCapturer::errorHook()
@@ -60,11 +66,13 @@ void SingleCapturer::errorHook()
 void SingleCapturer::stopHook()
 {
     SingleCapturerBase::stopHook();
+    capturer->stop();
 }
 void SingleCapturer::cleanupHook()
 {
     SingleCapturerBase::cleanupHook();
+    capturer.reset();
 }
-void SingleCapturer::imageCallback(){
+void SingleCapturer::imageCallback() {
     trigger();
 }

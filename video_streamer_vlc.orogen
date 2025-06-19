@@ -55,6 +55,7 @@ task_context 'SingleCapturer' do
     needs_configuration
 
     property 'uri', "/std/string"
+    property 'input_buffer_ms', 'int', -1
 
     output_port('frame', ro_ptr('base::samples::frame::Frame'))
 
