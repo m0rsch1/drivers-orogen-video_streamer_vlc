@@ -50,7 +50,7 @@ void SingleCapturer::updateHook()
     if (capturer->read(image)) {
 
         cv::Mat newmat(image.size(), CV_8UC3);
-        cv::cvtColor(image, newmat, cv::COLOR_RGBA2BGR);
+        cv::cvtColor(image, newmat, cv::COLOR_RGBA2RGB);
 
         frame_helper::FrameHelper::copyMatToFrame(newmat,frame);
         frame.time = base::Time::now();
