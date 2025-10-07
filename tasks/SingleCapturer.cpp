@@ -39,6 +39,7 @@ bool SingleCapturer::startHook()
 {
     if (! SingleCapturerBase::startHook())
         return false;
+    output.reset(&frame);
     capturer->start();
     return true;
 }
@@ -50,13 +51,17 @@ void SingleCapturer::updateHook()
     if (capturer->read(image)) {
 
         cv::Mat newmat(image.size(), CV_8UC3);
-        cv::cvtColor(image, newmat, cv::COLOR_RGBA2RGB);
+        cv::cvtColor(image, newmat, cv::COLOR_RGBA2BGR);
 
-        frame_helper::FrameHelper::copyMatToFrame(newmat,frame);
-        frame.time = base::Time::now();
+	base::samples::frame::Frame *frame_ptr = output.write_access();
+	if (frame_ptr)
+	{
+		frame_helper::FrameHelper::copyMatToFrame(newmat,*frame_ptr);
+		frame_ptr->time = base::Time::now();
+		output.reset(frame_ptr);
+		_frame.write(output);
+	}
 
-        output.reset(&frame);
-        _frame.write(output);        
     }
 }
 void SingleCapturer::errorHook()
